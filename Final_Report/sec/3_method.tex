@@ -1,72 +1,63 @@
-\section{Method}
+\section{Visuomotor Framework}
 \label{sec:method}
 
-Our methodology involves an iterative exploration of models and representations, progressing from standard diffusion-based policies to large-scale Vision-Language-Action (VLA) models, and finally to optimized action chunking architectures. We specifically focus on the challenges of bimanual coordination and the impact of visual backbones on task performance.
+In this section, we formally describe the architectures and representations employed in our study of bimanual garment folding. Our framework, illustrated in the system architecture diagram in Figure \ref{fig:system_diagram}, integrates generative temporal modeling with high-capacity visual backbones and mid-level geometric priors.
 
-\subsection{Phase 1: Diffusion Policy Baseline}
-We began our experiments with Diffusion Policy (DP) \cite{chi2023diffusionpolicy}, which models action trajectories as a denoising process. While effective for diverse manipulation tasks, DP struggled with the high-precision coordination required for bimanual garment folding. We observed that the model often produced inconsistent joint targets for the two arms, leading to catastrophic entanglement of the fabric.
+\subsection{Action Chunking with Transformers (ACT)}
+The primary architecture used for fine-grained bimanual manipulation is Action Chunking with Transformers (ACT) \cite{zhao2023act}. ACT addresses the "compounding error" problem in behavioral cloning by predicting a sequence (chunk) of actions $a_{t:t+k}$ given the current observation $o_t$. 
 
-\subsection{Phase 2: Vision-Language-Action Models}
-To leverage semantic understanding, we explored Vision-Language-Action (VLA) models. We first evaluated SmolVLA \cite{smolvla2025}, a compact model integrating visual and language tokens. We then progressed to $\pi_{0.5}$ \cite{pi05_2026}, which utilizes continuous flow matching, and X-VLA \cite{zheng2025xvlasoftpromptedtransformerscalable}, which employs soft-prompting for cross-modal alignment. While these models showed improved robustness in identifying garment parts, their performance was limited by the scale of our specialized demonstration dataset. The large number of parameters in these models made them prone to overfitting on the limited data available for the LeHome Challenge.
+The model consists of a Conditional Variational Autoencoder (CVAE) and a Transformer decoder. The CVAE encoder maps a sequence of actions to a latent variable $z$, which represents the "style" or "intent" of the trajectory. During inference, the latent $z$ is set to its mean value. The Transformer decoder then takes the observation $o_t$ and the latent $z$ to predict the action chunk $\hat{a}_{t:t+k}$. 
 
-\subsection{Phase 3: Action Chunking with Transformers (ACT)}
-Our final architecture was Action Chunking with Transformers (ACT) \cite{zhao2023act}. ACT addresses the problem of compounding errors by predicting chunks of actions simultaneously using a Conditional Variational Autoencoder (CVAE) and a Transformer decoder. This approach is particularly well-suited for bimanual tasks as it captures the temporal correlations between the two arms. With only 80 million parameters, ACT proved to be more data-efficient and easier to train for the specific dynamics of garment manipulation.
+In our experiments, we utilize a default chunk size of $k=100$. By default, the model operates in an \textbf{open-loop} fashion, where the number of action steps executed per inference ($n_{action}$) is equal to the chunk size ($n_{action} = k$). However, for our most robust configurations, we employ a \textbf{closed-loop} reactive protocol with $n_{action} = 1$, allowing the policy to re-plan at every timestep based on updated visual feedback. This formulation inherently captures the complex temporal dependencies and high-frequency coordination required for bimanual manipulation of deformable objects.
 
-\subsection{Geometric and Architectural Enhancements}
-We investigated several strategies to improve robustness and generalization:
+\subsection{Vision-Language-Action (VLA) Architectures}
+We evaluate several Vision-Language-Action models, including SmolVLA \cite{smolvla2025}, $\pi_{0.5}$ \cite{pi05_2026}, and X-VLA \cite{zheng2025xvlasoftpromptedtransformerscalable}. These models utilize large-scale pre-trained Vision-Language Models (VLMs) as visual encoders, which are integrated with action-prediction heads. To adapt these massive backbones to the specialized domain of garment folding, we employ Parameter-Efficient Fine-Tuning (PEFT) via Low-Rank Adaptation (LoRA) \cite{hu2021lora}. LoRA allows for the optimization of a small subset of parameters by introducing low-rank decomposition matrices into the attention layers, thereby preventing catastrophic forgetting while enabling task-specific alignment.
+
+\begin{table*}[t]
+\centering
+\caption{Per-garment success rates (\%) across different architectures. T-L: Top Long, T-S: Top Short, P-L: Pant Long, P-S: Pant Short. Macro-Avg is the mean across all categories. Leaderboard is the official evaluation on 20 garments per category (80 total). Hyphen (-) indicates that the model was not evaluated for that category.}
+\label{tab:per_garment_results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model Configuration} & \textbf{T-L (\%)} & \textbf{T-S (\%)} & \textbf{P-L (\%)} & \textbf{P-S (\%)} & \textbf{Macro-Avg (\%)} & \textbf{Leaderboard (\%)} \\
+\midrule
+Diffusion Policy (DP) \cite{chi2023diffusionpolicy}$^\ast$ & 5.00\% & 0.00\% & 3.00\% & 38.33\% & 11.67\% & - \\
+SmolVLA \cite{smolvla2025} & 56.67\% & 11.67\% & 35.00\% & 73.33\% & 44.17\% & 34.50\% \\
+SmolVLA + Augmentations & 55.00\% & 20.00\% & 30.00\% & 81.67\% & 46.67\% & - \\
+SmolVLA + Aug + PEFT (LoRA) & 65.00\% & 28.33\% & 43.00\% & 78.33\% & 53.75\% & 49.50\% \\
+X-VLA \cite{zheng2025xvlasoftpromptedtransformerscalable} + PEFT & - & 0.00\% & - & - & 0.00\% & - \\
+$\pi_{0.5}$ \cite{pi05_2026} (Base) & - & 0.00\% & - & - & 0.00\% & - \\
+$\pi_{0.5}$ \cite{pi05_2026} + PEFT & - & 3.33\% & - & - & 0.83\% & - \\
+\midrule
+ACT (Base) \cite{zhao2023act} & 75.00\% & 45.00\% & 38.00\% & 78.33\% & 58.96\% & - \\
+ACT + Depth & 70.83\% & 50.00\% & 47.00\% & 77.50\% & 61.25\% & - \\
+ACT + Depth + Aug (Chunk 64) & - & 40.00\% & 29.00\% & - & 34.59\% & - \\
+ACT + Depth + Aug (Chunk 100) & 61.67\% & 43.33\% & 50.00\% & 84.17\% & 59.79\% & - \\
+ACT + Depth + Aug (Chunk 128) & 65.00\% & 38.33\% & 35.00\% & 79.17\% & 54.38\% & - \\
+\textbf{ACT + Depth + Aug + $n_{action}=1$}$^\dagger$ & \textbf{66.67\%} & \textbf{48.33\%} & \textbf{53.00\%} & \textbf{83.33\%} & \textbf{62.92\%} & \textbf{Pending} \\
+ACT + Depth + Aug + $n_{action}=1$ + DINOv2 & 77.50\% & 33.33\% & 57.00\% & 86.67\% & 63.54\% & - \\
+\bottomrule
+\multicolumn{7}{l}{$^\ast$ Evaluated on 5 episodes per garment category; all other models evaluated on 10 episodes.} \\
+\multicolumn{7}{l}{$^\dagger$ Denotes official final submission to the LeHome Challenge leaderboard.}
+\end{tabular}%
+}
+\end{table*}
+
+\subsection{Dataset and Evaluation Protocol}
+The study utilizes the LeHome Challenge dataset \cite{lehome2026}, which comprises 12 unique garments per category (long-sleeved tops, short-sleeved tops, long pants, and shorts), for a total of 48 initial garments provided by the organizers. Our training pipeline utilizes 10 garments from each category, while the remaining 2 garments per category are held out for local unseen evaluation. 
+
+The final performance is validated through two distinct protocols:
 \begin{itemize}[leftmargin=*,noitemsep]
-    \item \textbf{Colorized Depth}: We augmented RGB observations with depth maps colorized using a JET gradient. This allows the model to perceive the 3D structure of the cloth, such as folds and wrinkles, while leveraging pre-trained visual features.
-    \item \textbf{Data Augmentations}: We implemented random cropping, rotation, and color jittering to simulate variations in garment pose and sensor noise.
-    \item \textbf{DINOv2 Backbone}: We compared the standard ResNet-18 visual backbone with DINOv2. The use of DINOv2 provided a richer feature representation, leading to improved success rates in complex garment categories.
-    \item \textbf{Temporal Parameters}: We performed a systematic analysis of the chunk size and the number of execution steps (\texttt{n\_action\_steps}). We found that executing a single action step before re-predicting the chunk (\texttt{n\_action\_steps} = 1) provided the best performance by allowing the model to remain responsive to the current state.
+    \item \textbf{Local Evaluation}: Conducted on the 10 seen and 2 unseen garments per category provided in the simulation environment.
+    \item \textbf{Leaderboard Evaluation}: The models are submitted for evaluation on a comprehensive set of 20 unique garments per category. This includes the 12 original garments plus 8 completely secret garments per category, providing a rigorous test of "true" generalization across 80 total garment variations.
 \end{itemize}
 
-\begin{figure*}[t]
-    \centering
-    \begin{tikzpicture}[node distance=2.5cm, auto, >=latex', thick]
-        % Input Snapshots
-        \node (left) [inner sep=0pt] {\includegraphics[width=2.5cm]{fig/left_rgb.png}};
-        \node at (left.north) [above] {\scriptsize Left RGB};
-        
-        \node (right) [right of=left, xshift=1cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/right_rgb.png}};
-        \node at (right.north) [above] {\scriptsize Right RGB};
-        
-        \node (top) [right of=right, xshift=1cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/top_rgb.png}};
-        \node at (top.north) [above] {\scriptsize Top RGB};
-        
-        % Depth Logic
-        \node (pc) [below of=left, yshift=-1.5cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/pointcloud00_L00.png}};
-        \node at (pc.north) [above] {\scriptsize Raw Pointcloud};
-        
-        \node (colorizer) [draw, rectangle, right of=pc, xshift=1cm, fill=yellow!20, minimum height=1.5cm, text width=2cm, align=center] {Depth Colorizer (JET)};
-        
-        \node (depth) [right of=colorizer, xshift=1cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/top_depth_colorized.png}};
-        \node at (depth.north) [above] {\scriptsize Colorized Depth};
-        
-        % Processing Pipeline
-        \node (aug) [draw, rectangle, right of=top, xshift=2cm, fill=green!10, minimum height=1.5cm, text width=1.8cm, align=center] {Data Augmentations};
-        
-        \node (backbone) [draw, rectangle, right of=aug, xshift=1.5cm, fill=orange!10, minimum height=1.5cm, text width=2cm, align=center] {DINOv2 Backbone};
-        
-        \node (act) [draw, rectangle, below of=backbone, yshift=-1.5cm, fill=red!10, minimum height=1.5cm, text width=2cm, align=center] {ACT Decoder\\(Chunk 100)};
-        
-        \node (output) [draw, rectangle, left of=act, xshift=-2.5cm, fill=purple!10, minimum height=1.5cm, text width=2cm, align=center] {Action State\\($n_{action}=1$)};
-        
-        % Connections
-        \draw[->] (left) -- (aug.west);
-        \draw[->] (right) -- (aug.west);
-        \draw[->] (top) -- (aug.west);
-        \draw[->] (depth) -| (aug.south);
-        \draw[->] (pc) -- (colorizer);
-        \draw[->] (colorizer) -- (depth);
-        \draw[->] (aug) -- (backbone);
-        \draw[->] (backbone) -- (act);
-        \draw[->] (act) -- (output);
-        
-    \end{tikzpicture}
-    \caption{System diagram of our best-performing model configuration. The inputs consist of left, right, and top RGB cameras, alongside a colorized depth map generated from the raw pointcloud. These are processed through a DINOv2 backbone and an Action Chunking Transformer (ACT) to output coordinated bimanual actions.}
-    \label{fig:system_diagram}
-\end{figure*}
 
-\subsection{Implementation Constraints}
-Our study was conducted on a shared HPC environment equipped with an NVIDIA RTX 4090 GPU. Due to high demand and the lack of a graphical interface, we were unable to implement online human-in-the-loop corrections. These constraints informed our focus on data efficiency and offline adaptation strategies.
+\subsection{Visual Representations and Backbones}
+Our framework leverages diverse visual backbones and mid-level representations to reduce appearance-based overfitting:
+\begin{itemize}[leftmargin=*,noitemsep]
+    \item \textbf{DINOv2}: We utilize DINOv2 \cite{oquab2024dinov2learningrobustvisual} as a high-capacity visual backbone. DINOv2 provides dense, robust features learned through self-supervised training on large-scale datasets, which prove critical for reasoning about the complex geometries of textiles.
+    \item \textbf{Colorized Depth}: To provide explicit geometric priors, we augment RGB observations with colorized depth maps. Raw depth values are mapped to a 3-channel JET-style gradient, allowing the visual encoders to leverage pre-trained features while perceiving the 3D structure of folds and wrinkles.
+    \item \textbf{Data Augmentations}: During training, we apply a suite of stochastic augmentations, including random cropping and rotation, to both RGB and colorized depth inputs. This regularizes the model and improves generalization to novel garment styles and poses.
+\end{itemize}

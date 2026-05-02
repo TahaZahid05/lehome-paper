@@ -1,6 +1,57 @@
 \section{Introduction}
 \label{sec:intro}
 
+\begin{figure*}[t]
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[node distance=3.2cm, auto, >=latex', thick]
+        % --- COLUMN 1 & 2: DEPTH PRE-PROCESSING ---
+        \node (pc) [inner sep=0pt] {\includegraphics[width=2cm]{fig/pointcloud00_L00.png}};
+        \node at (pc.north) [above, yshift=0.1cm] {\scriptsize Raw Pointcloud};
+
+        \node (colorizer) [draw, rectangle, right of=pc, xshift=0cm, fill=yellow!20, minimum height=1cm, text width=1.5cm, align=center] {\scriptsize Depth\\Colorizer};
+
+        % --- COLUMN 3: THE 4 MODEL INPUTS (ALIGNED) ---
+        \node (left) [above of=colorizer, yshift=4cm, xshift=2.5cm, inner sep=0pt] {\includegraphics[width=2cm]{fig/left_rgb.png}};
+        \node at (left.north) [above, yshift=0.1cm] {\scriptsize Left RGB};
+        
+        \node (right) [below of=left, yshift=0.2cm, inner sep=0pt] {\includegraphics[width=2cm]{fig/right_rgb.png}};
+        \node at (right.north) [above, yshift=0.1cm] {\scriptsize Right RGB};
+        
+        \node (top) [below of=right, yshift=0.2cm, inner sep=0pt] {\includegraphics[width=2cm]{fig/top_rgb.png}};
+        \node at (top.north) [above, yshift=0.1cm] {\scriptsize Top RGB};
+
+        \node (depth) [below of=top, yshift=0.2cm, inner sep=0pt] {\includegraphics[width=2cm]{fig/top_depth_colorized.png}};
+        \node at (depth.north) [above, yshift=0.1cm] {\scriptsize Colorized Depth};
+
+        % --- COLUMN 4: PROCESSING PIPELINE ---
+        \node (aug) [draw, rectangle, right of=right, xshift=2cm, fill=green!10, minimum height=3cm, text width=2.2cm, align=center] {Data\\Augmentations};
+
+        \node (backbone) [draw, rectangle, right of=aug, xshift=0.2cm, fill=orange!10, minimum height=2.5cm, text width=2.2cm, align=center] {\small DINOv2\\Backbone};
+
+        \node (act) [draw, rectangle, right of=backbone, xshift=0.2cm, fill=red!10, minimum height=2.5cm, text width=2.2cm, align=center] {\small ACT Decoder\\(Chunk 100)};
+
+        \node (output) [draw, rectangle, right of=act, xshift=0.2cm, fill=purple!10, minimum height=2.5cm, text width=2.2cm, align=center] {\small Action State\\($n_{action}=1$)};
+
+        % --- CONNECTIONS ---
+        \draw[->] (pc.east) -- (colorizer.west);
+        \draw[->] (colorizer.east) -- (depth.west);
+        
+        \draw[->] (left.east) -- (aug.west);
+        \draw[->] (right.east) -- (aug.west);
+        \draw[->] (top.east) -- (aug.west);
+        \draw[->] (depth.east) -- (aug.west);
+        
+        \draw[->] (aug.east) -- (backbone.west);
+        \draw[->] (backbone.east) -- (act.west);
+        \draw[->] (act.east) -- (output.west);
+        
+    \end{tikzpicture}
+    }
+    \caption{System diagram of our best-performing model configuration. The inputs consist of left, right, and top RGB cameras, alongside a colorized depth map generated from the raw pointcloud. These are processed through a DINOv2 backbone and an Action Chunking Transformer (ACT) to output coordinated bimanual actions.}
+    \label{fig:system_diagram}
+\end{figure*}
+
 Robotic garment manipulation is a benchmark for dexterous bimanual control. Unlike rigid object manipulation, handling textiles requires reasoning about infinite-dimensional configuration spaces and managing complex self-occlusions. The ICRA 2026 LeHome Challenge \cite{lehome2026} provides a rigorous platform for evaluating these capabilities, requiring robots to fold long-sleeved tops, short-sleeved tops, long pants, and shorts in a high-fidelity simulation environment \cite{mittal2023orbit}.
 
 This paper documents our systematic exploration of various visuomotor policies and visual representations to solve the bimanual folding task. Rather than focusing on a single architecture, we treat this project as an empirical study of the most promising strategies in modern imitation learning. Our journey followed a deliberate progression: beginning with Diffusion Policy \cite{chi2023diffusionpolicy}, we then explored the emerging class of Vision-Language-Action (VLA) models, including SmolVLA \cite{smolvla2025}, $\pi_{0.5}$ \cite{pi05_2026}, and X-VLA \cite{xvla2026}. Ultimately, we transitioned to Action Chunking with Transformers (ACT) \cite{zhao2023act}. We found ACT to be superior for this task due to its inherent data efficiency, its specific design for bimanual coordination, and its ability to handle fine-grained, contact-rich manipulation. Furthermore, with only 80 million parameters, ACT is significantly more lightweight than the foundation-scale VLA models, making it ideal for rapid iteration.
