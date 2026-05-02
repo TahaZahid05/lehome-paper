@@ -21,27 +21,52 @@ We investigated several strategies to improve robustness and generalization:
     \item \textbf{Temporal Parameters}: We performed a systematic analysis of the chunk size and the number of execution steps (\texttt{n\_action\_steps}). We found that executing a single action step before re-predicting the chunk (\texttt{n\_action\_steps} = 1) provided the best performance by allowing the model to remain responsive to the current state.
 \end{itemize}
 
-\begin{figure}[t]
+\begin{figure*}[t]
     \centering
-    \begin{tikzpicture}[node distance=1.5cm, auto]
-        \node (input) [draw, rectangle, fill=blue!10] {4 Camera Inputs};
-        \node (aug) [draw, rectangle, right of=input, xshift=1cm, fill=green!10] {Augmentation};
-        \node (backbone) [draw, rectangle, right of=aug, xshift=1.2cm, fill=orange!10] {DINOv2 Backbone};
-        \node (act) [draw, rectangle, below of=backbone, fill=red!10] {ACT Decoder};
-        \node (output) [draw, rectangle, left of=act, xshift=-1.5cm, fill=purple!10] {Action State};
+    \begin{tikzpicture}[node distance=2.5cm, auto, >=latex', thick]
+        % Input Snapshots
+        \node (left) [inner sep=0pt] {\includegraphics[width=2.5cm]{fig/left_rgb.png}};
+        \node at (left.north) [above] {\scriptsize Left RGB};
         
-        \draw[->] (input) -- (aug);
+        \node (right) [right of=left, xshift=1cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/right_rgb.png}};
+        \node at (right.north) [above] {\scriptsize Right RGB};
+        
+        \node (top) [right of=right, xshift=1cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/top_rgb.png}};
+        \node at (top.north) [above] {\scriptsize Top RGB};
+        
+        % Depth Logic
+        \node (pc) [below of=left, yshift=-1.5cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/pointcloud00_L00.png}};
+        \node at (pc.north) [above] {\scriptsize Raw Pointcloud};
+        
+        \node (colorizer) [draw, rectangle, right of=pc, xshift=1cm, fill=yellow!20, minimum height=1.5cm, text width=2cm, align=center] {Depth Colorizer (JET)};
+        
+        \node (depth) [right of=colorizer, xshift=1cm, inner sep=0pt] {\includegraphics[width=2.5cm]{fig/top_depth_colorized.png}};
+        \node at (depth.north) [above] {\scriptsize Colorized Depth};
+        
+        % Processing Pipeline
+        \node (aug) [draw, rectangle, right of=top, xshift=2cm, fill=green!10, minimum height=1.5cm, text width=1.8cm, align=center] {Data Augmentations};
+        
+        \node (backbone) [draw, rectangle, right of=aug, xshift=1.5cm, fill=orange!10, minimum height=1.5cm, text width=2cm, align=center] {DINOv2 Backbone};
+        
+        \node (act) [draw, rectangle, below of=backbone, yshift=-1.5cm, fill=red!10, minimum height=1.5cm, text width=2cm, align=center] {ACT Decoder\\(Chunk 100)};
+        
+        \node (output) [draw, rectangle, left of=act, xshift=-2.5cm, fill=purple!10, minimum height=1.5cm, text width=2cm, align=center] {Action State\\($n_{action}=1$)};
+        
+        % Connections
+        \draw[->] (left) -- (aug.west);
+        \draw[->] (right) -- (aug.west);
+        \draw[->] (top) -- (aug.west);
+        \draw[->] (depth) -| (aug.south);
+        \draw[->] (pc) -- (colorizer);
+        \draw[->] (colorizer) -- (depth);
         \draw[->] (aug) -- (backbone);
         \draw[->] (backbone) -- (act);
         \draw[->] (act) -- (output);
         
-        \node at (0.75, 0.3) {\scriptsize RGB + Depth};
-        \node at (5.5, -0.75) {\scriptsize Chunk Size 100};
-        \node at (2.5, -1.8) {\scriptsize $n_{action}=1$};
     \end{tikzpicture}
-    \caption{System diagram of our best-performing model configuration. The inputs consist of left, right, top RGB, and top colorized depth maps, which are processed through a DINOv2 backbone before being passed to the ACT decoder.}
+    \caption{System diagram of our best-performing model configuration. The inputs consist of left, right, and top RGB cameras, alongside a colorized depth map generated from the raw pointcloud. These are processed through a DINOv2 backbone and an Action Chunking Transformer (ACT) to output coordinated bimanual actions.}
     \label{fig:system_diagram}
-\end{figure}
+\end{figure*}
 
 \subsection{Implementation Constraints}
 Our study was conducted on a shared HPC environment equipped with an NVIDIA RTX 4090 GPU. Due to high demand and the lack of a graphical interface, we were unable to implement online human-in-the-loop corrections. These constraints informed our focus on data efficiency and offline adaptation strategies.
