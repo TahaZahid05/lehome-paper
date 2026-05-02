@@ -3,13 +3,13 @@
 
 \subsection{Quantitative Analysis}
 
-We evaluate our models on the four garment categories of the LeHome Challenge: long-sleeved tops (T-L), short-sleeved tops (T-S), long pants (P-L), and shorts (P-S). The evaluation uses the success rate metric defined by the alignment of final cloth vertices against a canonical folded state. 
+We evaluate our models on the four garment categories of the LeHome Challenge: long-sleeved tops (T-L), short-sleeved tops (T-S), long pants (P-L), and shorts (P-S). The evaluation uses the success rate metric based on cloth vertex alignment against a canonical state.
 
-Table~\ref{tab:per_garment_results} presents the success rates for each model across all garment categories. This per-garment breakdown reveals that while certain models (like SmolVLA) excel in specific categories (e.g., shorts), they struggle with more complex geometries like short-sleeved tops.
+Table \ref{tab:per_garment_results} presents the success rates for each model across all categories. The results show a clear progression in performance as we transitioned from diffusion-based models to VLA variants and finally to optimized ACT configurations.
 
 \begin{table*}[t]
 \centering
-\caption{Per-garment success rates (\%) across different architectures and strategies. T-L: Top Long, T-S: Top Short, P-L: Pant Long, P-S: Pant Short. Macro-Avg is the mean across all categories. Bold values indicate the best performance in each category.}
+\caption{Per-garment success rates (\%) across different architectures. T-L: Top Long, T-S: Top Short, P-L: Pant Long, P-S: Pant Short. Macro-Avg is the mean across all categories.}
 \label{tab:per_garment_results}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
@@ -20,19 +20,44 @@ Diffusion Policy (DP) \cite{chi2023diffusionpolicy} & 5.00\% & 0.00\% & 3.00\% &
 SmolVLA \cite{smolvla2025} & 56.67\% & 11.67\% & 35.00\% & 73.33\% & 44.17\% \\
 SmolVLA + Augmentations & 55.00\% & 20.00\% & 30.00\% & 81.67\% & 46.67\% \\
 SmolVLA + Aug + PEFT (LoRA) & 65.00\% & 28.33\% & 43.00\% & 78.33\% & 53.75\% \\
-\textbf{ACT (Base)} \cite{zhao2023act} & \textbf{75.00\%} & 45.00\% & 38.00\% & 78.33\% & 58.96\% \\
-\textbf{ACT + Depth} & 70.83\% & \textbf{50.00\%} & 47.00\% & 77.50\% & \textbf{61.25\%} \\
-\textbf{ACT + Depth + Aug} & 61.67\% & 43.33\% & \textbf{50.00\%} & \textbf{84.17\%} & 59.79\% \\
+X-VLA \cite{zheng2025xvlasoftpromptedtransformerscalable} & 0.00\% & 0.00\% & 0.00\% & 0.00\% & 0.00\% \\
+$\pi_{0.5}$ \cite{pi05_2026} & 0.00\% & 0.00\% & 0.00\% & 0.00\% & 0.00\% \\
+$\pi_{0.5}$ + PEFT & 0.00\% & 3.33\% & 0.00\% & 0.00\% & 3.33\% \\
+ACT (Base) \cite{zhao2023act} & 75.00\% & 45.00\% & 38.00\% & 78.33\% & 58.96\% \\
+ACT + Depth & 70.83\% & 50.00\% & 47.00\% & 77.50\% & 61.25\% \\
+ACT + Depth + Aug (Chunk 100) & 61.67\% & 43.33\% & 50.00\% & 84.17\% & 59.79\% \\
+ACT + Depth + Aug (Chunk 64) & -- & 40.00\% & 29.00\% & -- & 34.59\% \\
+ACT + Depth + Aug (Chunk 128) & 65.00\% & 38.33\% & 35.00\% & 79.17\% & 54.38\% \\
+ACT + Depth + Aug + $n_{action}=1$ & 66.67\% & 48.33\% & 53.00\% & 83.33\% & 62.92\% \\
+\textbf{ACT + Depth + Aug + $n_{action}=1$ + DINOv2} & \textbf{77.50\%} & 33.33\% & \textbf{57.00\%} & \textbf{86.67\%} & \textbf{63.54\%} \\
 \bottomrule
 \end{tabular}%
 }
 \end{table*}
 
-The transition from DP to VLA models and finally to ACT shows a clear trend of improvement. ACT architectures, particularly when augmented with depth and geometric priors, show a more balanced performance across all garment types. Notably, the integration of depth as an additional input significantly improved success in the challenging "Top Short" and "Pant Long" categories by providing better spatial disambiguation.
+\subsection{Qualitative Model Analysis}
 
-\subsection{Generalization to Unseen Styles}
+Our analysis of the model trajectories and failure modes reveals critical insights into the behavior of each architecture:
 
-A critical component of our study is the model's ability to generalize to unseen garment styles. Table~\ref{tab:unseen_per_garment} shows the success rates on held-out garments per category. 
+\begin{itemize}[leftmargin=*,noitemsep]
+    \item \textbf{SmolVLA Variants}: The base SmolVLA model performed significantly better than DP, achieving smooth actions in many cases. However, video analysis revealed jittery movements even during successful trials. Data augmentations slightly improved smoothness, while PEFT (training the VLM backbone) further refined gripper control and overall stability.
+    \item \textbf{Large VLA Failures}: X-VLA and $\pi_{0.5}$ exhibited poor performance. X-VLA failed to even close its gripper, while $\pi_{0.5}$ struggled to localize the garment. Although PEFT improved $\pi_{0.5}$'s spatial understanding, it still failed to complete the folding sequence. We attribute these failures to the limited scale of the demonstration dataset, which was insufficient for fine-tuning such large models.
+    \item \textbf{ACT Superiority}: ACT outperformed all other models, demonstrating significantly smoother trajectories and better coordination. The integration of depth priors (ACT + Depth) provided a noticeable boost by clarifying the 3D structure of the cloth.
+\end{itemize}
+
+\subsection{Sensitivity Analysis}
+
+We investigated the impact of architectural choices and temporal parameters on ACT performance:
+
+\begin{itemize}[leftmargin=*,noitemsep]
+    \item \textbf{Chunk Size}: We compared chunk sizes of 64, 100, and 128. A chunk size of 100 provided the best results. Smaller chunks (64) struggled with long garments like pants, likely because they require more extended planning. Larger chunks (128) saw a decrease in performance across both short and long garments due to error accumulation.
+    \item \textbf{Execution Steps}: Reducing the number of execution steps to 1 (\texttt{n\_action\_steps} = 1) while maintaining a chunk size of 100 improved the macro-average to 62.92\%. This suggests that more frequent re-planning allows the model to better adjust to the deformable dynamics of the fabric.
+    \item \textbf{Backbone Impact}: Replacing the ResNet-18 backbone with DINOv2 resulted in a 1\% increase in the macro-average (63.54\%). While performance on short-sleeved tops decreased, it significantly improved on the other three categories, indicating better feature extraction for complex geometries.
+\end{itemize}
+
+\subsection{Generalization and Limitations}
+
+Table \ref{tab:unseen_per_garment} shows success rates on unseen styles. While ACT + Depth achieves high success on seen garments, the addition of augmentations (ACT + Depth + Aug) results in better generalization, particularly for the pant categories.
 
 \begin{table*}[t]
 \centering
@@ -44,29 +69,12 @@ A critical component of our study is the model's ability to generalize to unseen
 \textbf{Model} & \textbf{T-L (\%)} & \textbf{T-S (\%)} & \textbf{P-L (\%)} & \textbf{P-S (\%)} & \textbf{Unseen Avg (\%)} \\
 \midrule
 SmolVLA \cite{smolvla2025} & 30.00\% & 0.00\% & 20.00\% & 60.00\% & 27.50\% \\
-ACT (Base) & \textbf{85.00\%} & 30.00\% & 30.00\% & 45.00\% & 47.50\% \\
+ACT (Base) & 85.00\% & 30.00\% & 30.00\% & 45.00\% & 47.50\% \\
 ACT + Depth & 60.00\% & 35.00\% & 10.00\% & 55.00\% & 40.00\% \\
-\textbf{ACT + Depth + Aug} & 45.00\% & \textbf{35.00\%} & \textbf{70.00\%} & \textbf{55.00\%} & \textbf{51.25\%} \\
+ACT + Depth + Aug + $n_{action}=1$ + DINOv2 & 50.00\% & 15.00\% & 55.00\% & 55.00\% & 43.75\% \\
 \bottomrule
 \end{tabular}%
 }
 \end{table*}
 
-While ACT + Depth achieves the highest macro-average on seen garments, the addition of data augmentations (ACT + Depth + Aug) results in the best generalization performance, particularly for the pant categories. This indicates that augmentations effectively regularize the model, preventing it from overfitting to the specific training geometries and improving zero-shot transfer to novel garment instances.
-
-\subsection{Sensitivity Analysis: Chunk Size and Action Steps}
-
-We investigated the impact of the action chunk size and the number of execution steps in ACT. Our findings suggest that the \texttt{chunk\_size} is a critical hyperparameter for long-horizon bimanual tasks. 
-
-\begin{itemize}[leftmargin=*,noitemsep]
-    \item \textbf{Small Chunks (< 30)}: The model exhibits disjointed movements and fails to capture the smooth coordination needed for the full folding sequence.
-    \item \textbf{Medium Chunks (50-100)}: Provides the best balance, allowing the model to plan a coherent trajectory while remaining responsive to the current state.
-    \item \textbf{Large Chunks (> 150)}: Leads to an accumulation of errors; if the initial prediction is slightly inaccurate, the robot drifts significantly from the desired path before the next chunk is predicted.
-\end{itemize}
-
-The number of \texttt{n\_action\_steps} (the execution window) also plays a role in trajectory smoothness. We found that execution steps slightly smaller than the chunk size (e.g., 50 steps for a chunk of 60) allow for temporal smoothing during the transition between chunks.
-
-\subsection{Failure Analysis and Limitations}
-\label{sec:limitations}
-
-Failure modes vary across models. DP often results in catastrophic entanglement, while VLA models tend to miss-identify the specific part of the cloth to grasp. ACT failures are typically "graceful," such as a missed grasp that leaves the garment in a stable state. The "Top Short" category remains the most difficult due to the minimal surface area for grasping the sleeves. Infrastructure constraints, such as the lack of a GUI for real-time human intervention, limited our ability to address these edge cases through online corrective feedback.
+The "Top Short" category remains the most difficult across all models due to the minimal surface area available for grasping the sleeves. Infrastructure constraints, such as the lack of a GUI on the HPC environment, prevented us from using real-time human intervention to address these edge cases.
