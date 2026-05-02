@@ -1,0 +1,21 @@
+\section{Introduction}
+
+Getting a robot to fold clothes sounds simple. In practice, it is one of the hardest problems in robotics because clothes change shape constantly. A shirt laid flat looks completely different from one that has been crumpled, and two shirts of different styles share almost no visual similarity in color or texture despite having the same underlying geometric structure. This means a robot cannot memorize what a shirt looks like. It has to understand the geometry of what it is looking at, regardless of how it has been deformed or how it appears visually.
+
+Our project participates in the IEEE ICRA 2026 LeHome Challenge~\cite{lehome2026}, a competition that asks teams to train a bimanual robot arm to fold four types of garments: long-sleeved tops, short-sleeved tops, long pants, and shorts inside IsaacLab~\cite{mittal2023orbit}. The competition provides a dataset of 1,000 teleoperation demonstrations split evenly across the four garment categories (250 each), and evaluates how well a trained model generalizes to garment styles it has never seen before.
+
+Our research question is: \textit{Can replacing RGB-based visual representations with geometry-based point cloud representations, combined with canonical coordinate normalization, improve a robot policy's ability to generalize across unseen garment styles?}
+
+The competition provides a clean evaluation framework through a fixed success-rate metric, a held-out test set of unseen garments, and a public leaderboard, enabling controlled experiments and objective comparison.
+
+The key insight motivating our work is that existing policies rely on RGB images as their primary visual input, encoding color and texture. These properties vary wildly across garment styles. A policy trained on a blue shirt has no reason to generalize to a striped shirt if it has learned to recognize shirts by appearance. In contrast, the geometric shape of a shirt, including the structure of its sleeves, collar, and hem, is consistent across styles. A policy that reasons about geometry rather than appearance should generalize more robustly.
+
+This connects directly to a well-established idea in category-level object pose estimation: Normalized Object Coordinate Space (NOCS)~\cite{wang2019normalized}, which maps different instances of the same object category into a shared canonical representation. Our work applies this principle to robot manipulation policies, asking whether normalizing visual input into a canonical geometric space improves generalization across unseen garment instances.
+
+We build on 3D Diffusion Policy (DP3)~\cite{ze2024dp3} as our base model and extend it with NOCS-based coordinate normalization, motivated by UniFolding's~\cite{unifolding2023} demonstrated generalization gains on bimanual garment folding. Our contributions are:
+
+\begin{itemize}[leftmargin=*,noitemsep]
+    \item We apply DP3's point cloud representation to deformable garment folding, extending its demonstrated generalization advantage from rigid objects to a new domain.
+    \item We integrate NOCS normalization into DP3's pipeline for cross-garment style generalization, combining two independently validated ideas in a continuous joint trajectory action space for the first time.
+    \item We provide a structured ablation study isolating the contribution of each component against the provided competition baselines.
+\end{itemize}

@@ -1,0 +1,71 @@
+Project Progress Report (10% of course
+grade)
+Total: 100 points
+Focus: “Can you build and run your system?”
+
+1. Core Pipeline Implementation — 25 pts
+Substantial implementation progress (~50% or more of pipeline working end-to-end).
+
+2. Running Demo (Required) — 25 pts
+Clear demonstration of the pipeline working (even in overfitting / controlled setting). Note that
+you may show results on training/validation cases and discuss appropriate steps you need to
+take to extend it to a wider setting such as industrial setting or out-of-domain setting for the final
+project demos. Must show a working system even if it is on a tiny dataset, partially complete etc.
+
+3. Baseline Implementation — 15 pts
+At least one naive / zero-shot / simple baseline implemented for comparison. Clearly state
+what you used as your initial baseline and how you built upon it, what features you added and
+what is the performance improvement of these added features.
+
+4. Preliminary Results — 15 pts
+Initial qualitative and/or quantitative outputs from both method and baseline.
+
+5. Debugging & Engineering Effort — 10 pts
+Evidence of meaningful engineering progress (data processing, training setup, fixes, etc.). What
+challenges occured along the way and how you mitigated them to make the pipeline work.
+
+6. Initial Analysis — 5 pts
+Basic discussion of what is working, failing, and why. What features still need to be implemented
+and how you will achieve those.
+
+7. Remaining Work Plan — 5 pts
+Concrete next steps toward a complete system (no repetition of proposal content).
+
+Final Project Report (10% of course grade)
+Total: 120 points
+Focus: “Does your method work, and do you understand it?”
+
+1. Final Method & System Design — 10 pts
+Clear, refined pipeline with improvements over baselines as detailed in the initial proposal.
+
+2. Implementation Completeness — 10 pts
+Fully working system with all major components integrated. A final system demo either offline or
+online is to be shown in the presentation.
+
+3. Quantitative Evaluation — 15 pts
+Comparison against at least one baseline with clear metrics and tables.
+
+4. Qualitative Results — 15 pts
+Visual evidence demonstrating strengths/weaknesses of the method when compared against
+the baselines i.e. where the method succeeds but baseline fails.
+
+5. Ablation Study and comparative analysis — 15 pts
+At least 3 meaningful ablations (e.g., components, losses, design choices). Clear explanation
+of where your method works and where baselines fail.
+
+6. Failure Cases & Limitations — 5 pts
+Honest discussion of weaknesses and edge cases.
+
+7. Clarity & Organization — 10 pts
+Well-structured, readable, research-style report with pipeline, qualitative figures, appropriate
+tables etc. Must not extend 6 double-column CVPR style format. Final report should be in CVPR
+style format.
+
+8. Final Presentation — 20 pts
+Well-structured final presentation summarizing all key aspects of the projects above.
+
+8. Working Inference Code — 20 pts
+Submit a final working inference code with clear instructions on how to setup, run the code,
+what checkpoints to download and how to get evaluation metrics.
+
+

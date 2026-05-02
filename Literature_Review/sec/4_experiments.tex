@@ -1,0 +1,28 @@
+\section{Experiments}
+
+\subsection{Experimental Setup}
+
+All experiments are evaluated on the held-out unseen garment styles from the competition's Release set, reporting per-category and overall success rates on the public leaderboard. Success is measured by geometric fold conditions on cloth mesh vertices, checked every 50 simulation steps, for up to 600 steps per episode. We train on all four garment categories combined (1,000 total demonstrations) and evaluate generalization to 2 unseen styles per category.
+
+\subsection{Ablation Study}
+
+We run five experiments in a strict ablation structure where each adds exactly one variable over the previous, allowing clean attribution of any performance changes.
+
+\textbf{Experiment 1: RGB Baseline.} Standard Diffusion Policy~\cite{chi2023diffusionpolicy} with three RGB cameras and ResNet18 encoder. This establishes the baseline score we aim to improve upon and represents the strongest provided baseline given its direct validation on shirt folding.
+
+\textbf{Experiment 2: Depth as State Input.} Diffusion Policy with depth fed as a flat state input, supported natively by the training YAML without architectural changes. This isolates whether the depth modality alone helps.
+
+\textbf{Experiment 3: DP3 with Point Clouds.} DP3~\cite{ze2024dp3} with point cloud input replacing RGB. This tests the core question of whether geometric representation improves generalization on deformable garment folding, a setting DP3 has not been evaluated on previously.
+
+\textbf{Experiment 4: DP3 with Garment Metadata.} Adds garment scale and initial pose conditioning from the dataset metadata on top of Experiment 3. This tests whether this free generalization signal provides any additional benefit.
+
+\textbf{Experiment 5: DP3 with NOCS.} DP3 with NOCS-normalized point clouds. This tests whether canonical coordinate normalization, the key mechanism behind UniFolding's~\cite{unifolding2023} generalization gains, provides additional improvement when combined with DP3's point cloud representation in a continuous joint trajectory action space.
+
+\subsection{Evaluation Metric}
+
+The primary metric is the competition's success rate broken down by garment category (long-sleeved tops, short-sleeved tops, long pants, shorts) and reported overall on the LeHome leaderboard. Secondary analysis will compare per-category performance across experiments to understand whether geometric representations help more for some garment types than others, for example whether pants benefit differently from shirts due to their different geometric structure.
+
+\subsection{Computing Resources}
+
+We will use the University HPC GPU cluster for model training and IsaacLab simulations.
+

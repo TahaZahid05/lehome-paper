@@ -1,0 +1,31 @@
+\section{Method}
+\label{sec:method}
+
+Our methodology followed an iterative exploration of models and representations, progressing from standard diffusion-based policies to large-scale Vision-Language-Action (VLA) models, and finally to optimized action chunking architectures. This section details each stage of our exploration and the specific enhancements implemented.
+
+\subsection{Phase 1: Initial Baseline (Diffusion Policy)}
+
+We began our experiments with Diffusion Policy (DP) \cite{chi2023diffusionpolicy}, which has demonstrated strong performance in diverse manipulation tasks by modeling action trajectories as a denoising process. However, we found that DP struggled with the high-precision coordination required for bimanual garment folding, often producing inconsistent joint targets.
+
+\subsection{Phase 2: Vision-Language-Action Models (SmolVLA, $\pi_{0.5}$, and X-VLA)}
+
+We then explored the emerging class of Vision-Language-Action (VLA) models. We first evaluated SmolVLA \cite{smolvla2025}, a compact VLA model that integrates visual and language tokens. SmolVLA provided better semantic understanding of the task instructions but lacked the fine-grained control necessary for handling deformable fabrics. To leverage more powerful foundational knowledge, we then explored the $\pi_{0.5}$ model \cite{pi05_2026}, an evolution of $\pi_0$ that uses a combination of discrete tokens and continuous flow matching for dexterous control. We also evaluated X-VLA \cite{xvla2026}, which focuses on cross-modal alignment specifically for complex manipulation. While these models showed improved robustness in identifying garment parts (sleeves, hems), their inference latency on our hardware and the challenges of adapting their large backbones to the specific dynamics of IsaacLab led us to seek more efficient alternatives.
+
+\subsection{Phase 3: Action Chunking with Transformers (ACT)}
+
+Our final and most successful architecture was Action Chunking with Transformers (ACT) \cite{zhao2023act}. ACT addresses the "compounding error" problem by predicting chunks of actions simultaneously using a CVAE and a Transformer decoder. This approach is particularly well-suited for bimanual tasks as it inherently captures the temporal correlations between the two arms.
+
+\subsection{Geometric and Generalization Enhancements}
+
+Across all models, we investigated several strategies to improve robustness and generalization:
+
+\begin{itemize}[leftmargin=*,noitemsep]
+    \item \textbf{Colorized Depth}: To provide richer geometric information, we augmented the raw RGB observations with depth maps colorized using a JET-style gradient. This allows the model to leverage pre-trained visual features while explicitly perceiving the 3D structure of the cloth, such as folds and wrinkles.
+    \item \textbf{Data Augmentations}: We implemented a suite of augmentations, including random cropping, rotation, and color jittering (on the colorized depth), to simulate variations in garment pose and sensor noise.
+    \item \textbf{PEFT via LoRA}: For the VLA models (SmolVLA, $\pi_{0.5}$), we employed Parameter-Efficient Fine-Tuning (PEFT) using Low-Rank Adaptation (LoRA) \cite{hu2021lora}. This allowed us to adapt the massive pre-trained backbones to the garment folding domain by training only a small subset of parameters, preventing catastrophic forgetting while improving task alignment.
+    \item \textbf{Hyperparameter Tuning}: We performed a systematic analysis of the ACT temporal parameters. Specifically, we varied the \texttt{chunk\_size} (number of actions predicted in one chunk) and the \texttt{n\_action\_steps} (number of execution steps before the next chunk is predicted) to find the optimal balance between long-horizon planning and real-time responsiveness.
+\end{itemize}
+
+\subsection{Human-in-the-Loop and Infrastructure}
+
+We also investigated the feasibility of Human-in-the-Loop (HIL) corrections using a DAgger-style framework \cite{ross2011dagger}. The intent was to capture failure cases and provide corrective demonstrations. However, as noted in Section~\ref{sec:limitations}, the lack of a graphical interface on our HPC environment made real-time human intervention impractical.

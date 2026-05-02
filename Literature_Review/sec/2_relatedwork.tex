@@ -1,0 +1,59 @@
+\section{Related Work}
+
+\subsection{Robotic Garment Manipulation}
+Manipulating highly deformable objects like textiles presents unique challenges compared to rigid objects due to infinite-dimensional configuration spaces, severe self-occlusions, and complex dynamics \cite{longhini2024unfolding, 8957044}. Recent frameworks have automated tasks like untangling and smoothing by employing dense visual correspondences, learned keypoints, and deep imitation learning from algorithmic supervisors \cite{ganapathi2020learningdensevisualcorrespondences, grannen2020untanglingdenseknotslearning, seita2020deepimitationlearningsequential}. Other approaches employ high-velocity "fling" actions, depth-based bimanual architectures, or optical flow mappings \cite{DBLP:journals/corr/abs-2105-03655, avigal2022speedfolding, weng2022fabricflownet}. For garment folding, systems funnel fabrics into predefined canonical alignments or execute sequentially predicted pick-and-place actions \cite{canberk2022clothfunnelscanonicalizedalignmentmultipurpose, unifolding2023}.
+
+While these frameworks effectively automate garment handling, they heavily depend on discrete heuristic pick-and-place actions, 2D flow mappings, or canonical alignments that struggle to generalize across unseen, highly deformable geometries. Our work replaces 2D heuristics and discrete primitives with a purely 3D point-cloud pipeline mapped to continuous joint trajectories, forcing the policy to leverage geometric features for robust cross-style generalization.
+
+\subsection{Visuomotor Imitation Learning}
+Recent imitation learning (IL) has evolved from energy-based models and transformers \cite{florence2021implicitbehavioralcloning, shafiullah2022behaviortransformerscloningk, zeng2022transporternetworksrearrangingvisual} to large-scale Vision-Language-Action (VLA) foundation models like RT-2 and OpenVLA \cite{brohan2023rt1roboticstransformerrealworld, brohan2023rt2visionlanguageactionmodelstransfer, kim2024openvlaopensourcevisionlanguageactionmodel} which map 2D visual observations and language instructions to discrete robot actions. Models like $\pi_0$ have integrated flow-matching to overcome discrete action tokenization limitations \cite{black2026pi0visionlanguageactionflowmodel}. State-of-the-art visuomotor policies such as ACT, Diffusion Policy, and SmolVLA achieve unprecedented precision by predicting continuous action chunks directly from visual inputs to mitigate compounding errors \cite{zhao2023act, chi2023diffusionpolicy, smolvla2025}.
+
+While these visuomotor policies represent state-of-the-art imitation learning, they fundamentally rely on 2D RGB-based visual encoders. Because these networks encode color and visual texture rather than 3D geometric structure, they overfit to the appearance of training objects, limiting generalization to unseen highly deformable garment styles. Our work directly addresses this limitation by replacing appearance-biased RGB encoders with purely geometry-focused 3D point-cloud representations (DP3), isolating whether removing color bias resolves the cross-style generalization gap in continuous deformable manipulation.
+
+\subsection{3D Representations and Canonical Spaces}
+To overcome geometric information loss in 2D imaging and computational inefficiency of early 3D volumetric grids \cite{wu20153dshapenetsdeeprepresentation}, modern representation learning has shifted toward sparse, permutation-invariant architectures like PointNet, PointNet++, and Point Transformers \cite{qi2017pointnetdeeplearningpoint, qi2017pointnet2, zhao2021pointtransformer}. To ensure 3D features generalize across novel instances, frameworks map objects into category-level canonical spaces like NOCS \cite{wang2019normalized} or leverage implicit differentiable shape priors like ShAPO for robust pose, size, and appearance optimization \cite{irshad2022shapoimplicitrepresentationsmultiobject}. For highly deformable textiles, point clouds and canonical alignments have proven crucial for managing near-infinite degrees of freedom, facilitating dynamic garment tracking \cite{xue2025garmenttrackingcategorylevelgarmentpose}, differentiable sim-to-real physics modeling \cite{sundaresan2025diffcloudrealtosimpointclouds}, and automated garment folding \cite{unifolding2023}. Recently, 3D Diffusion Policy (DP3) integrated sparse point cloud representations with generative action modeling, demonstrating immense improvements in spatial generalization \cite{ze2024dp3}.
+
+While DP3 proves that 3D point clouds prevent appearance-based overfitting, its spatial generalization has primarily been validated on rigid objects. Conversely, UniFolding demonstrates that NOCS normalization enables cross-garment generalization but relies exclusively on discrete pick-and-place actions. Our work bridges these paradigms by integrating NOCS normalization into the DP3 point-cloud pipeline, mapping unseen garment geometries into a shared canonical coordinate space before policy conditioning, explicitly testing if this representation unlocks zero-shot cross-style generalization for continuous-trajectory deformable folding.
+
+\begin{table*}[ht]
+\centering
+\caption{Comparison of related works. $\checkmark$~= Yes, $\times$~= No.}
+\label{tab:related_works}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Method} & \textbf{3D Input} & \textbf{Canonical Space} & \textbf{Continuous Actions} & \textbf{Cross-style Gen.} & \textbf{Deformable Objects} \\
+\midrule
+\multicolumn{6}{l}{\textit{Robotic Garment Manipulation}} \\
+\midrule
+SpeedFolding~\cite{avigal2022speedfolding}                              & $\times$ & $\times$     & $\times$     & $\checkmark$ & $\checkmark$ \\
+Cloth Funnels~\cite{canberk2022clothfunnelscanonicalizedalignmentmultipurpose} & $\times$ & $\checkmark$ & $\times$     & $\times$     & $\checkmark$ \\
+FlingBot~\cite{DBLP:journals/corr/abs-2105-03655}                       & $\times$ & $\times$     & $\times$     & $\times$     & $\checkmark$ \\
+FabricFlowNet~\cite{weng2022fabricflownet}                              & $\times$ & $\times$     & $\times$     & $\times$     & $\checkmark$ \\
+UniFolding~\cite{unifolding2023}                                        & $\checkmark$ & $\times$  & $\times$     & $\checkmark$ & $\checkmark$ \\
+Ganapathi et al.~\cite{ganapathi2020learningdensevisualcorrespondences} & $\times$ & $\times$     & $\times$     & $\times$     & $\checkmark$ \\
+\midrule
+\multicolumn{6}{l}{\textit{Visuomotor Imitation Learning}} \\
+\midrule
+ACT~\cite{zhao2023act}                          & $\times$ & $\times$ & $\checkmark$ & $\times$     & $\times$ \\
+Diffusion Policy~\cite{chi2023diffusionpolicy}  & $\times$ & $\times$ & $\checkmark$ & $\times$     & $\times$ \\
+RT-2~\cite{brohan2023rt2visionlanguageactionmodelstransfer} & $\times$ & $\times$ & $\times$ & $\times$  & $\times$ \\
+OpenVLA~\cite{kim2024openvlaopensourcevisionlanguageactionmodel} & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+$\pi_0$~\cite{black2026pi0visionlanguageactionflowmodel} & $\times$ & $\times$ & $\checkmark$ & $\times$ & $\times$ \\
+SmolVLA~\cite{smolvla2025}                      & $\times$ & $\times$ & $\checkmark$ & $\times$     & $\times$ \\
+\midrule
+\multicolumn{6}{l}{\textit{3D Representations \& Canonical Spaces}} \\
+\midrule
+PointNet~\cite{qi2017pointnetdeeplearningpoint} & $\checkmark$ & $\times$     & $\times$     & $\times$     & $\times$ \\
+PointNet++~\cite{qi2017pointnet2}               & $\checkmark$ & $\times$     & $\times$     & $\times$     & $\times$ \\
+NOCS~\cite{wang2019normalized}                  & $\checkmark$ & $\checkmark$ & $\times$     & $\checkmark$ & $\times$ \\
+ShAPO~\cite{irshad2022shapoimplicitrepresentationsmultiobject} & $\checkmark$ & $\checkmark$ & $\times$ & $\checkmark$ & $\times$ \\
+GarmentTracking~\cite{xue2025garmenttrackingcategorylevelgarmentpose} & $\checkmark$ & $\checkmark$ & $\times$ & $\checkmark$ & $\checkmark$ \\
+DiffCloud~\cite{sundaresan2025diffcloudrealtosimpointclouds}   & $\checkmark$ & $\times$     & $\times$     & $\times$     & $\checkmark$ \\
+3D Diffusion Policy~\cite{ze2024dp3}            & $\checkmark$ & $\times$     & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\midrule
+\textbf{Ours (NOCS + DP3)}                      & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{table*}

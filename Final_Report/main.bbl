@@ -1,0 +1,156 @@
+\begin{thebibliography}{19}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Anonymous(2026)]{xvla2026}
+Anonymous.
+\newblock {X-VLA: Cross-modal Vision-Language-Action Models for Deformable
+  Manipulation}.
+\newblock Under Review, 2026.
+
+\bibitem[Avigal et~al.(2022)Avigal, Berscheid, Asfour, Kr{\"o}ger, and
+  Goldberg]{avigal2022speedfolding}
+Yahav Avigal, Lars Berscheid, Tamim Asfour, Torsten Kr{\"o}ger, and Ken
+  Goldberg.
+\newblock {SpeedFolding: Learning Efficient Bimanual Folding of Garments}.
+\newblock In \emph{IEEE/RSJ International Conference on Intelligent Robots and
+  Systems (IROS)}, 2022.
+
+\bibitem[Black et~al.(2026)Black, Brown, Driess, Esmail, Equi, Finn, Fusai,
+  Groom, Hausman, Ichter, Jakubczak, Jones, Ke, Levine, Li-Bell, Mothukuri,
+  Nair, Pertsch, Shi, Tanner, Vuong, Walling, Wang, and
+  Zhilinsky]{black2026pi0visionlanguageactionflowmodel}
+Kevin Black, Noah Brown, Danny Driess, Adnan Esmail, Michael Equi, Chelsea
+  Finn, Niccolo Fusai, Lachy Groom, Karol Hausman, Brian Ichter, Szymon
+  Jakubczak, Tim Jones, Liyiming Ke, Sergey Levine, Adrian Li-Bell, Mohith
+  Mothukuri, Suraj Nair, Karl Pertsch, Lucy~Xiaoyang Shi, James Tanner, Quan
+  Vuong, Anna Walling, Haohuan Wang, and Ury Zhilinsky.
+\newblock $\pi_0$: A vision-language-action flow model for general robot
+  control, 2026.
+
+\bibitem[Brohan et~al.(2023)Brohan, Brown, Carbajal, Chebotar, Chen,
+  Choromanski, Ding, Driess, Dubey, Finn, Florence, Fu, Arenas, Gopalakrishnan,
+  Han, Hausman, Herzog, Hsu, Ichter, Irpan, Joshi, Julian, Kalashnikov, Kuang,
+  Leal, Lee, Lee, Levine, Lu, Michalewski, Mordatch, Pertsch, Rao, Reymann,
+  Ryoo, Salazar, Sanketi, Sermanet, Singh, Singh, Soricut, Tran, Vanhoucke,
+  Vuong, Wahid, Welker, Wohlhart, Wu, Xia, Xiao, Xu, Xu, Yu, and
+  Zitkovich]{brohan2023rt2visionlanguageactionmodelstransfer}
+Anthony Brohan, Noah Brown, Justice Carbajal, Yevgen Chebotar, Xi Chen,
+  Krzysztof Choromanski, Tianli Ding, Danny Driess, Avinava Dubey, Chelsea
+  Finn, Pete Florence, Chuyuan Fu, Montse~Gonzalez Arenas, Keerthana
+  Gopalakrishnan, Kehang Han, Karol Hausman, Alexander Herzog, Jasmine Hsu,
+  Brian Ichter, Alex Irpan, Nikhil Joshi, Ryan Julian, Dmitry Kalashnikov,
+  Yuheng Kuang, Isabel Leal, Lisa Lee, Tsang-Wei~Edward Lee, Sergey Levine, Yao
+  Lu, Henryk Michalewski, Igor Mordatch, Karl Pertsch, Kanishka Rao, Krista
+  Reymann, Michael Ryoo, Grecia Salazar, Pannag Sanketi, Pierre Sermanet,
+  Jaspiar Singh, Anikait Singh, Radu Soricut, Huong Tran, Vincent Vanhoucke,
+  Quan Vuong, Ayzaan Wahid, Stefan Welker, Paul Wohlhart, Jialin Wu, Fei Xia,
+  Ted Xiao, Peng Xu, Sichun Xu, Tianhe Yu, and Brianna Zitkovich.
+\newblock Rt-2: Vision-language-action models transfer web knowledge to robotic
+  control, 2023.
+
+\bibitem[Cadene et~al.(2025)]{smolvla2025}
+Remi Cadene et~al.
+\newblock {SmolVLA: A Vision-Language-Action Model for Affordable and Efficient
+  Robotics}, 2025.
+
+\bibitem[Chi et~al.(2023)Chi, Feng, Du, Xu, Cousineau, Burchfiel, and
+  Song]{chi2023diffusionpolicy}
+Cheng Chi, Siyuan Feng, Yilun Du, Zhenjia Xu, Eric Cousineau, Benjamin
+  Burchfiel, and Shuran Song.
+\newblock {Diffusion Policy: Visuomotor Policy Learning via Action Diffusion}.
+\newblock In \emph{Robotics: Science and Systems}, 2023.
+
+\bibitem[Ganapathi et~al.(2020)Ganapathi, Sundaresan, Thananjeyan, Balakrishna,
+  Seita, Grannen, Hwang, Hoque, Gonzalez, Jamali, Yamane, Iba, and
+  Goldberg]{ganapathi2020learningdensevisualcorrespondences}
+Aditya Ganapathi, Priya Sundaresan, Brijen Thananjeyan, Ashwin Balakrishna,
+  Daniel Seita, Jennifer Grannen, Minho Hwang, Ryan Hoque, Joseph~E. Gonzalez,
+  Nawid Jamali, Katsu Yamane, Soshi Iba, and Ken Goldberg.
+\newblock Learning dense visual correspondences in simulation to smooth and
+  fold real fabrics, 2020.
+
+\bibitem[Garcia-Camacho et~al.(2020)Garcia-Camacho, Lippi, Welle, Yin,
+  Antonova, Varava, Borras, Torras, Marino, Alenyà, and Kragic]{8957044}
+Irene Garcia-Camacho, Martina Lippi, Michael~C. Welle, Hang Yin, Rika Antonova,
+  Anastasiia Varava, Julia Borras, Carme Torras, Alessandro Marino, Guillem
+  Alenyà, and Danica Kragic.
+\newblock Benchmarking bimanual cloth manipulation.
+\newblock \emph{IEEE Robotics and Automation Letters}, 5\penalty0 (2):\penalty0
+  1111--1118, 2020.
+
+\bibitem[Grannen et~al.(2020)Grannen, Sundaresan, Thananjeyan, Ichnowski,
+  Balakrishna, Hwang, Viswanath, Laskey, Gonzalez, and
+  Goldberg]{grannen2020untanglingdenseknotslearning}
+Jennifer Grannen, Priya Sundaresan, Brijen Thananjeyan, Jeffrey Ichnowski,
+  Ashwin Balakrishna, Minho Hwang, Vainavi Viswanath, Michael Laskey, Joseph~E.
+  Gonzalez, and Ken Goldberg.
+\newblock Untangling dense knots by learning task-relevant keypoints, 2020.
+
+\bibitem[Hu et~al.(2021)Hu, Shen, Wallis, Allen-Zhu, Li, Wang, Wang, and
+  Chen]{hu2021lora}
+Edward~J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean
+  Wang, Lu Wang, and Weizhu Chen.
+\newblock {LoRA: Low-Rank Adaptation of Large Language Models}, 2021.
+
+\bibitem[Intelligence(2026)]{pi05_2026}
+Physical Intelligence.
+\newblock {$\pi_{0.5}$: A Vision-Language-Action Flow Model for General Robot
+  Control}.
+\newblock \url{https://www.physicalintelligence.company/blog/pi0}, 2026.
+
+\bibitem[Kim et~al.(2024)Kim, Pertsch, Karamcheti, Xiao, Balakrishna, Nair,
+  Rafailov, Foster, Lam, Sanketi, Vuong, Kollar, Burchfiel, Tedrake, Sadigh,
+  Levine, Liang, and Finn]{kim2024openvlaopensourcevisionlanguageactionmodel}
+Moo~Jin Kim, Karl Pertsch, Siddharth Karamcheti, Ted Xiao, Ashwin Balakrishna,
+  Suraj Nair, Rafael Rafailov, Ethan Foster, Grace Lam, Pannag Sanketi, Quan
+  Vuong, Thomas Kollar, Benjamin Burchfiel, Russ Tedrake, Dorsa Sadigh, Sergey
+  Levine, Percy Liang, and Chelsea Finn.
+\newblock Openvla: An open-source vision-language-action model, 2024.
+
+\bibitem[Longhini et~al.(2024)]{longhini2024unfolding}
+Alberta Longhini et~al.
+\newblock {Unfolding the Literature: A Review of Robotic Cloth Manipulation}.
+\newblock \emph{Annual Review of Control, Robotics, and Autonomous Systems},
+  2024.
+
+\bibitem[Mittal et~al.(2023)Mittal, Yu, Yu, et~al.]{mittal2023orbit}
+Mayank Mittal, Calvin Yu, Qinxi Yu, et~al.
+\newblock {ORBIT: A Unified Simulation Framework for Interactive Robot Learning
+  Environments}.
+\newblock In \emph{IEEE Robotics and Automation Letters}, 2023.
+
+\bibitem[Ross et~al.(2011)Ross, Gordon, and Bagnell]{ross2011dagger}
+Stephane Ross, Geoffrey Gordon, and Drew Bagnell.
+\newblock A reduction of imitation learning and structured prediction to
+  no-regret online learning.
+\newblock In \emph{Proceedings of the Fourteenth International Conference on
+  Artificial Intelligence and Statistics}, pages 627--635. PMLR, 2011.
+
+\bibitem[Wu et~al.(2026)Wu, Wang, Li, et~al.]{lehome2026}
+Ruihai Wu, Yuran Wang, Zeyi Li, et~al.
+\newblock {LeHome Challenge 2026: Simulation-Driven Competition on Deformable
+  Object Manipulation}.
+\newblock \url{https://lehome-challenge.com}, 2026.
+
+\bibitem[Xue et~al.(2023)Xue, Li, Xu, et~al.]{unifolding2023}
+Han Xue, Zhong Li, Jing Xu, et~al.
+\newblock {UniFolding: Towards Sample-efficient, Scalable, and Generalizable
+  Robotic Garment Folding}.
+\newblock In \emph{Conference on Robot Learning}, 2023.
+
+\bibitem[Ze et~al.(2024)Ze, Zhang, Zhang, Hu, Wang, and Xu]{ze2024dp3}
+Yanjie Ze, Gu Zhang, Kangning Zhang, Chenyuan Hu, Muhan Wang, and Huazhe Xu.
+\newblock {3D Diffusion Policy: Generalizable Visuomotor Policy Learning via
+  Simple 3D Representations}.
+\newblock In \emph{Robotics: Science and Systems}, 2024.
+
+\bibitem[Zhao et~al.(2023)Zhao, Kumar, Levine, and Finn]{zhao2023act}
+Tony~Z. Zhao, Vikash Kumar, Sergey Levine, and Chelsea Finn.
+\newblock {Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware}.
+\newblock In \emph{Robotics: Science and Systems}, 2023.
+
+\end{thebibliography}

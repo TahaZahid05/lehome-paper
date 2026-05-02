@@ -1,0 +1,8 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this work, we explored the application of generative imitation learning for bimanual garment folding in the context of the ICRA 2026 LeHome Challenge. Our investigation led us to shift from our initial 3D Diffusion Policy (DP3) proposal to an architecture based on Action Chunking with Transformers (ACT). We demonstrated that ACT's ability to model action sequences as chunks is significantly better suited for the coordinated bimanual trajectories required in cloth manipulation compared to standard Diffusion Policy.
+
+By integrating geometric priors through colorized depth and employing extensive data augmentations, we achieved a macro-average success rate of 61.25\% and demonstrated robust generalization to unseen garment styles. Our findings highlight the importance of choosing architectures that can capture complex temporal dependencies and the effectiveness of mid-level geometric representations in reducing appearance-based overfitting.
+
+Future work includes resolving the infrastructure limitations to implement human-in-the-loop correction and further exploring the potential of Large Vision-Language-Action models through more extensive parameter-efficient fine-tuning. We believe that combining the strengths of transformer-based action chunking with the vast pre-trained knowledge of VLAs is a promising direction for achieving more generalizable and capable robotic garment manipulation systems.
