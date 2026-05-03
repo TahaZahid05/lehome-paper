@@ -4,27 +4,23 @@
 In this section, we formally describe the architectures and representations employed in our study of bimanual garment folding. Our framework, illustrated in the system architecture diagram in Figure \ref{fig:system_diagram}, integrates generative temporal modeling with high-capacity visual backbones and mid-level geometric priors.
 
 \subsection{Action Chunking with Transformers (ACT)}
-The primary architecture used for fine-grained bimanual manipulation is Action Chunking with Transformers (ACT) \cite{zhao2023act}. ACT addresses the "compounding error" problem in behavioral cloning by predicting a sequence (chunk) of actions $a_{t:t+k}$ given the current observation $o_t$. 
-
-The model consists of a Conditional Variational Autoencoder (CVAE) and a Transformer decoder. The CVAE encoder maps a sequence of actions to a latent variable $z$, which represents the "style" or "intent" of the trajectory. During inference, the latent $z$ is set to its mean value. The Transformer decoder then takes the observation $o_t$ and the latent $z$ to predict the action chunk $\hat{a}_{t:t+k}$. 
-
-In our experiments, we utilize a default chunk size of $k=100$. By default, the model operates in an \textbf{open-loop} fashion, where the number of action steps executed per inference ($n_{action}$) is equal to the chunk size ($n_{action} = k$). However, for our most robust configurations, we employ a \textbf{closed-loop} reactive protocol with $n_{action} = 1$, allowing the policy to re-plan at every timestep based on updated visual feedback. This formulation inherently captures the complex temporal dependencies and high-frequency coordination required for bimanual manipulation of deformable objects.
+We employ Action Chunking with Transformers (ACT) \cite{zhao2023act}, which mitigates compounding errors in behavioral cloning by predicting action sequences $a_{t:t+k}$ given an observation $o_t$. The architecture uses a Conditional Variational Autoencoder (CVAE) to model trajectory "style" via a latent variable $z$, and a Transformer decoder to predict the action chunk $\hat{a}_{t:t+k}$. We use a default chunk size $k=100$. While standard ACT operates open-loop ($n_{action}=k$), we utilize a closed-loop reactive protocol ($n_{action}=1$) for our best configurations, enabling re-planning at every timestep to handle the complex dynamics of textile manipulation.
 
 \subsection{Vision-Language-Action (VLA) Architectures}
 We evaluate several Vision-Language-Action models, including SmolVLA \cite{smolvla2025}, $\pi_{0.5}$ \cite{pi05_2026}, and X-VLA \cite{zheng2025xvlasoftpromptedtransformerscalable}. These models utilize large-scale pre-trained Vision-Language Models (VLMs) as visual encoders, which are integrated with action-prediction heads. To adapt these massive backbones to the specialized domain of garment folding, we employ Parameter-Efficient Fine-Tuning (PEFT) via Low-Rank Adaptation (LoRA) \cite{hu2021lora}. LoRA allows for the optimization of a small subset of parameters by introducing low-rank decomposition matrices into the attention layers, thereby preventing catastrophic forgetting while enabling task-specific alignment.
 
 \begin{table*}[t]
 \centering
-\caption{Per-garment success rates (\%) across different architectures. T-L: Top Long, T-S: Top Short, P-L: Pant Long, P-S: Pant Short. Macro-Avg is the mean across all categories. Leaderboard is the official evaluation on 20 garments per category (80 total). Hyphen (-) indicates that the model was not evaluated for that category.}
+\caption{Per-garment success rates (\%) across different architectures. T-L: Top Long, T-S: Top Short, P-L: Pant Long, P-S: Pant Short. Macro-Avg is the mean across all categories. Leaderboard is the official evaluation on 20 garments per category (80 total). All models are evaluated on 10 episodes per garment with stochastic rotation and translation offsets. Hyphen (-) indicates that the model was not evaluated for that category.}
 \label{tab:per_garment_results}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccc}
 \toprule
 \textbf{Model Configuration} & \textbf{T-L (\%)} & \textbf{T-S (\%)} & \textbf{P-L (\%)} & \textbf{P-S (\%)} & \textbf{Macro-Avg (\%)} & \textbf{Leaderboard (\%)} \\
 \midrule
-Diffusion Policy (DP) \cite{chi2023diffusionpolicy}$^\ast$ & 5.00\% & 0.00\% & 3.00\% & 38.33\% & 11.67\% & - \\
-SmolVLA \cite{smolvla2025} & 56.67\% & 11.67\% & 35.00\% & 73.33\% & 44.17\% & 34.50\% \\
-SmolVLA + Augmentations & 55.00\% & 20.00\% & 30.00\% & 81.67\% & 46.67\% & - \\
+Diffusion Policy (DP) \cite{chi2023diffusionpolicy} & 5.00\% & 0.83\% & 3.00\% & 39.17\% & 12.00\% & - \\
+SmolVLA \cite{smolvla2025} & 47.50\% & 12.50\% & 35.00\% & 70.00\% & 41.25\% & 34.50\% \\
+SmolVLA + Augmentations & 58.33\% & 20.83\% & 41.00\% & 80.83\% & 50.25\% & - \\
 SmolVLA + Aug + PEFT (LoRA) & 65.00\% & 28.33\% & 43.00\% & 78.33\% & 53.75\% & 49.50\% \\
 X-VLA \cite{zheng2025xvlasoftpromptedtransformerscalable} + PEFT & - & 0.00\% & - & - & 0.00\% & - \\
 $\pi_{0.5}$ \cite{pi05_2026} (Base) & - & 0.00\% & - & - & 0.00\% & - \\
@@ -38,7 +34,6 @@ ACT + Depth + Aug (Chunk 128) & 65.00\% & 38.33\% & 35.00\% & 79.17\% & 54.38\% 
 \textbf{ACT + Depth + Aug + $n_{action}=1$}$^\dagger$ & \textbf{66.67\%} & \textbf{48.33\%} & \textbf{53.00\%} & \textbf{83.33\%} & \textbf{62.92\%} & \textbf{Pending} \\
 ACT + Depth + Aug + $n_{action}=1$ + DINOv2 & 77.50\% & 33.33\% & 57.00\% & 86.67\% & 63.54\% & - \\
 \bottomrule
-\multicolumn{7}{l}{$^\ast$ Evaluated on 5 episodes per garment category; all other models evaluated on 10 episodes.} \\
 \multicolumn{7}{l}{$^\dagger$ Denotes official final submission to the LeHome Challenge leaderboard.}
 \end{tabular}%
 }
@@ -49,15 +44,17 @@ The study utilizes the LeHome Challenge dataset \cite{lehome2026}, which compris
 
 The final performance is validated through two distinct protocols:
 \begin{itemize}[leftmargin=*,noitemsep]
-    \item \textbf{Local Evaluation}: Conducted on the 10 seen and 2 unseen garments per category provided in the simulation environment.
-    \item \textbf{Leaderboard Evaluation}: The models are submitted for evaluation on a comprehensive set of 20 unique garments per category. This includes the 12 original garments plus 8 completely secret garments per category, providing a rigorous test of "true" generalization across 80 total garment variations.
+    \item \textbf{Local Evaluation}: Conducted on the 10 seen and 2 unseen garments per category provided in the simulation environment. Each model is evaluated on 10 episodes per garment, with each episode initialized with stochastic rotation and translation offsets to ensure robust testing.
+    \item \textbf{Leaderboard Evaluation}: The models are submitted for evaluation on a comprehensive set of 20 unique garments per category (80 total), including secret variations.
 \end{itemize}
+
+A successful fold is defined by the final geometric configuration of the garment at the end of a 20-second episode. Specifically, success is registered when the Euclidean distance between predefined keypoints on the garment (e.g., the distance between $P_1$ and $P_3$) satisfies a task-specific threshold (e.g., $\le 6.7$ cm), ensuring that the garment is aligned according to the target fold pattern.
 
 
 \subsection{Visual Representations and Backbones}
 Our framework leverages diverse visual backbones and mid-level representations to reduce appearance-based overfitting:
 \begin{itemize}[leftmargin=*,noitemsep]
-    \item \textbf{DINOv2}: We utilize DINOv2 \cite{oquab2024dinov2learningrobustvisual} as a high-capacity visual backbone. DINOv2 provides dense, robust features learned through self-supervised training on large-scale datasets, which prove critical for reasoning about the complex geometries of textiles.
+    \item \textbf{ResNet-18}: We utilize ResNet-18 \cite{he2015deepresiduallearningimage} as our primary visual backbone. While lower in capacity than modern vision transformers, its relative simplicity and inductive biases provide superior generalization to unseen garment styles when trained on our domain-specific dataset.
     \item \textbf{Colorized Depth}: To provide explicit geometric priors, we augment RGB observations with colorized depth maps. Raw depth values are mapped to a 3-channel JET-style gradient, allowing the visual encoders to leverage pre-trained features while perceiving the 3D structure of folds and wrinkles.
     \item \textbf{Data Augmentations}: During training, we apply a suite of stochastic augmentations, including random cropping and rotation, to both RGB and colorized depth inputs. This regularizes the model and improves generalization to novel garment styles and poses.
 \end{itemize}

@@ -27,7 +27,7 @@
         % --- COLUMN 4: PROCESSING PIPELINE ---
         \node (aug) [draw, rectangle, right of=right, xshift=2cm, fill=green!10, minimum height=3cm, text width=2.2cm, align=center] {Data\\Augmentations};
 
-        \node (backbone) [draw, rectangle, right of=aug, xshift=0.2cm, fill=orange!10, minimum height=2.5cm, text width=2.2cm, align=center] {\small DINOv2\\Backbone};
+        \node (backbone) [draw, rectangle, right of=aug, xshift=0.2cm, fill=orange!10, minimum height=2.5cm, text width=2.2cm, align=center] {\small ResNet-18\\Backbone};
 
         \node (act) [draw, rectangle, right of=backbone, xshift=0.2cm, fill=red!10, minimum height=2.5cm, text width=2.2cm, align=center] {\small ACT Decoder\\(Chunk 100)};
 
@@ -48,13 +48,13 @@
         
     \end{tikzpicture}
     }
-    \caption{System diagram of our best-performing model configuration. The inputs consist of left, right, and top RGB cameras, alongside a colorized depth map generated from the raw pointcloud. These are processed through a DINOv2 backbone and an Action Chunking Transformer (ACT) to output coordinated bimanual actions.}
+    \caption{System architecture: Triple RGB cameras and colorized depth are processed via ResNet-18 and ACT for coordinated bimanual folding.}
     \label{fig:system_diagram}
 \end{figure*}
 
 Robotic garment manipulation is a benchmark for dexterous bimanual control. Unlike rigid object manipulation, handling textiles requires reasoning about infinite-dimensional configuration spaces and managing complex self-occlusions. The ICRA 2026 LeHome Challenge \cite{lehome2026} provides a rigorous platform for evaluating these capabilities, requiring robots to fold long-sleeved tops, short-sleeved tops, long pants, and shorts in a high-fidelity simulation environment \cite{mittal2023orbit}.
 
-This paper documents our systematic exploration of various visuomotor policies and visual representations to solve the bimanual folding task. Rather than focusing on a single architecture, we treat this project as an empirical study of the most promising strategies in modern imitation learning. Our journey followed a deliberate progression: beginning with Diffusion Policy \cite{chi2023diffusionpolicy}, we then explored the emerging class of Vision-Language-Action (VLA) models, including SmolVLA \cite{smolvla2025}, $\pi_{0.5}$ \cite{pi05_2026}, and X-VLA \cite{xvla2026}. Ultimately, we transitioned to Action Chunking with Transformers (ACT) \cite{zhao2023act}. We found ACT to be superior for this task due to its inherent data efficiency, its specific design for bimanual coordination, and its ability to handle fine-grained, contact-rich manipulation. Furthermore, with only 80 million parameters, ACT is significantly more lightweight than the foundation-scale VLA models, making it ideal for rapid iteration.
+This paper documents our systematic exploration of various visuomotor policies and visual representations to solve the bimanual folding task. We present an empirical study of visuomotor policies, progressing from Diffusion Policy \cite{chi2023diffusionpolicy} and VLAs (SmolVLA, $\pi_{0.5}$, X-VLA) to ACT \cite{zhao2023act}. We found ACT to be superior for this task due to its inherent data efficiency, its specific design for bimanual coordination, and its ability to handle fine-grained, contact-rich manipulation. Furthermore, with only 80 million parameters, ACT is significantly more lightweight than the foundation-scale VLA models, making it ideal for rapid iteration.
 
 We evaluate the role of geometric priors by providing colorized depth maps as an additional input, the impact of data augmentations on cross-style generalization, and the utility of Parameter-Efficient Fine-Tuning (PEFT) for adapting large-scale models. We also perform a sensitivity analysis on temporal parameters, specifically the action chunk size and the number of execution steps, and compare the performance of ACT when using a DINOv2 backbone versus the standard ResNet-18.
 
@@ -64,6 +64,7 @@ In summary, our contributions include:
 \begin{itemize}[leftmargin=*,noitemsep]
     \item A comparative study of multiple visuomotor architectures (DP, SmolVLA, $\pi_{0.5}$, X-VLA, ACT) for bimanual garment folding.
     \item An evaluation of mid-level visual representations (colorized depth) and their impact on reducing appearance-based overfitting.
-    \item A systematic analysis of data augmentation, PEFT, and backbone selection (DINOv2) for improving task performance and generalization.
+    \item A systematic analysis of data augmentation, PEFT, and backbone selection (ResNet vs. DINOv2) for improving task performance and generalization.
     \item A detailed breakdown of success rates per garment category and an analysis of critical temporal hyperparameters.
 \end{itemize}
+    

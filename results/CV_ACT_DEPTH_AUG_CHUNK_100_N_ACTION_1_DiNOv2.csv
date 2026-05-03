@@ -1,0 +1,12 @@
+Shared Model,Success %,,,,
+top_long,77.50%,,,,
+top_short,33.33%,,,Macro-Average,63.54%
+pant_long,57%,,,,
+pant_short,86.67%,,,,
+,,,,,
+,,,,,
+Unseen Percentages,Unseen_0,Unseen_1,Average,,
+top_long,100.00%,0.00%,50.00%,,
+top_short,0.00%,30.00%,15.00%,,
+pant_long,80.00%,30.00%,55.00%,,
+pant_short,30.00%,80.00%,55.00%,,
